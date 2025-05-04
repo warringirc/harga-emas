@@ -2,50 +2,127 @@
 <html lang="ms">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Harga Emas Terkini</title>
   <style>
+    :root {
+      --gold: #d4af37;
+      --bg: #f9f6f1;
+      --text: #333;
+      --card: #fff;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--gold);
+      color: white;
+      padding: 20px 0;
+      width: 100%;
       text-align: center;
-      padding: 40px;
-      background: #fff9f0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+
     h1 {
-      color: #c49b0c;
+      margin: 0;
+      font-size: 1.8em;
     }
-    #price {
-      font-size: 2em;
-      margin: 20px 0;
-      color: #333;
+
+    .card {
+      background-color: var(--card);
+      border-radius: 12px;
+      padding: 30px;
+      margin-top: 40px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
     }
+
+    .price {
+      font-size: 2.2em;
+      font-weight: bold;
+      margin: 15px 0;
+      color: var(--text);
+    }
+
+    .currency-label {
+      font-size: 1em;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
     .note {
-      font-size: 0.9em;
-      color: #777;
+      font-size: 0.85em;
+      color: #888;
+      margin-top: 25px;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5em;
+      }
+      .price {
+        font-size: 1.8em;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Harga Emas Terkini</h1>
-  <div id="price">Memuatkan harga...</div>
-  <div class="note">Sumber: goldapi.io | Kadar tukaran: MYR</div>
+
+  <header>
+    <h1>Harga Emas Terkini</h1>
+  </header>
+
+  <div class="card">
+    <div class="currency-label">Harga dalam Ringgit Malaysia (MYR)</div>
+    <div id="price-myr" class="price">Memuatkan...</div>
+  </div>
+
+  <div class="card">
+    <div class="currency-label">Harga dalam Dolar Amerika (USD)</div>
+    <div id="price-usd" class="price">Memuatkan...</div>
+  </div>
+
+  <div class="note">Sumber data: <a href="https://www.goldapi.io" target="_blank">goldapi.io</a> | Harga per gram</div>
 
   <script>
-    fetch("https://www.goldapi.io/api/XAU/MYR", {
-      headers: {
-        "x-access-token": "goldapi-rlnv8sma9ks0lq-io",
-        "Content-Type": "application/json"
-      }
-    })
-    .then(res => res.json())
-    .then(data => {
-      const pricePerOunce = data.price; // Harga dalam MYR per troy ounce
-      const pricePerGram = pricePerOunce / 31.1035;
-      document.getElementById("price").innerText = `RM ${pricePerGram.toFixed(2)} / gram`;
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById("price").innerText = "Gagal ambil data.";
-    });
+    const headers = {
+      "x-access-token": "goldapi-rlnv8sma9ks0lq-io",
+      "Content-Type": "application/json"
+    };
+
+    // MYR
+    fetch("https://www.goldapi.io/api/XAU/MYR", { headers })
+      .then(res => res.json())
+      .then(data => {
+        const pricePerGram = data.price / 31.1035;
+        document.getElementById("price-myr").textContent = `RM ${pricePerGram.toFixed(2)}`;
+      })
+      .catch(() => {
+        document.getElementById("price-myr").textContent = "Gagal ambil data.";
+      });
+
+    // USD
+    fetch("https://www.goldapi.io/api/XAU/USD", { headers })
+      .then(res => res.json())
+      .then(data => {
+        const pricePerGram = data.price / 31.1035;
+        document.getElementById("price-usd").textContent = `USD $${pricePerGram.toFixed(2)}`;
+      })
+      .catch(() => {
+        document.getElementById("price-usd").textContent = "Gagal ambil data.";
+      });
   </script>
+
 </body>
 </html>
